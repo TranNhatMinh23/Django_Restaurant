@@ -1,0 +1,11 @@
+python -m venv env
+source env/Scripts/activate
+deactivate
+pip freeze
+pip install django.
+py -m pip install Django
+django-admin startproject foodOnline_main . .
+django-admin startproject app .
+python manage.py runserver
+docker-compose build
+docker-compose run --rm app sh -c "django-admin startproject app ."
