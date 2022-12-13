@@ -10,8 +10,10 @@ from .models import User, UserProfile
 from django.contrib import messages, auth
 from .utils import detectUser, send_verification_email
 from django.contrib.auth.decorators import login_required, user_passes_test
-from vendor.models import Vendor
+
 from django.core.exceptions import PermissionDenied
+from vendor.models import Vendor
+from django.template.defaultfilters import slugify
 
 
 # Restrict the vendor from accessing the customer page
@@ -33,7 +35,7 @@ def check_role_customer(user):
 def registerUser(request):
     if request.user.is_authenticated:
         messages.warning(request, 'You are already logged in!')
-        return redirect('myAccount')
+        return redirect('dashboard')
     elif request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
@@ -90,6 +92,8 @@ def registerVendor(request):
             user.save()
             vendor = v_form.save(commit=False)
             vendor.user = user
+            vendor_name = v_form.cleaned_data['vendor_name']
+            vendor.vendor_slug = slugify(vendor_name)+'-'+str(user.id)
             user_profile = UserProfile.objects.get(user=user)
             vendor.user_profile = user_profile
             vendor.save()
