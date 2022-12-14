@@ -85,9 +85,18 @@ $(document).ready(function(){
             
             success: function(response){
                 console.log(response)
+                if(response.status == 'login_required'){
+                    swal(response.message, '', info).then(function(){
+                        window.location = '/login';
+
+                    })
+                }else if(response.status == 'Failed'){
+                    swal(response.message, '', 'error')
+                }else{
+                    $('#cart_counter').html(response.cart_counter['cart_count']);
+                    $('#qty-'+food_id).html(response.qty);
+                }
                 
-                $('#cart_counter').html(response.cart_counter['cart_count']);
-                $('#qty-'+food_id).html(response.qty);
                 
             }
         })
@@ -112,16 +121,60 @@ $(document).ready(function(){
             
             success: function(response){
                 console.log(response)
-                if(response.status == 'Failed'){
-                    console.log(response)
+                if(response.status == 'login_required'){
+                    swal(response.message, '', info).then(function(){
+                        window.location = '/login';
+
+                    })
+                }else if(response.status == 'Failed'){
+                    swal(response.message, '', 'error')
                 }else{
                     $('#cart_counter').html(response.cart_counter['cart_count']);
                     $('#qty-'+food_id).html(response.qty);
-                }
+            }
                 
             }
         })
     })
+    //delete
+    $('.delete_cart').on('click', function(e){
+        e.preventDefault();
+        food_id = $(this).attr('data-id');
+        url = $(this).attr('data-url');
+
+        
+        $.ajax({
+            type: "GET",
+            url: url,
+            
+            success: function(response){
+                console.log(response)
+                if(response.status == 'Failed'){
+                    swal(response.message, '', 'error')
+                }else{
+                    $('#cart_counter').html(response.cart_counter['cart_count']);
+                    swal(response.status, response.message, 'success')
+                    removeCartItem(0, cart_id);
+                    // checkEmptyCart();
+            }
+                
+            }
+        })
+    })
+    // delete the cart element if the qty is 0:
+    function removeCartItem(cartItemQty, cart_id){
+        if(cartItemQty <= 0){
+            // remove the cart item element
+            document.getElementById("cart-item-"+cart_id).remove()
+        }
+    }
+    // Check if the cart is empty
+    // function checkEmptyCart(){
+    //     var cart_counter = document.getElementById('cart_counter').innerHTML
+    //     if(cart_counter == 0){
+    //         document.getElementById("empty-cart").style.display = "block";
+    //     }
+    // }
 })
 
     
