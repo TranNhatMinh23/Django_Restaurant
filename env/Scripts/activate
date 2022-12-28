@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="E:\Django\Django_middle\Django_Restaurant\env"
+VIRTUAL_ENV="E:\Django\Django-FoodCrud\Django_Restaurant2\env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

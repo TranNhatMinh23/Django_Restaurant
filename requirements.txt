@@ -13,6 +13,7 @@ django-debug-toolbar==3.7.0
 django-phone-field==1.8.1
 filelock==3.8.0
 future==0.16.0
+GDAL @ file:///E:/Django/Django-FoodCrud/Django_Restaurant2/GDAL-3.4.3-cp310-cp310-win_amd64.whl
 idna==3.3
 jmespath==0.10.0
 pathspec==0.9.0
