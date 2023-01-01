@@ -9,7 +9,9 @@ from orders.forms import OrderForm
 from orders.utils import generate_order_number
 from .models import Order, OrderedFood, Payment
 import simplejson as json
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+@login_required(login_url='login')
 def place_order(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     cart_count = cart_items.count()
@@ -94,7 +96,6 @@ def payments(request):
         }
         send_notification(mail_subject, mail_template, context)
 
-
         # SEND ORDER RECEIVED EMAIL TO THE VENDOR
         mail_subject = 'You have received a new order.'
         mail_template = 'orders/new_order_received.html'
@@ -110,7 +111,7 @@ def payments(request):
         send_notification(mail_subject, mail_template, context)
 
         # CLEAR THE CART IF THE PAYMENT IS SUCCESS
-        # cart_items.delete() 
+        cart_items.delete() 
 
         # RETURN BACK TO AJAX WITH THE STATUS SUCCESS OR FAILURE
         response = {
@@ -119,3 +120,27 @@ def payments(request):
         }
         return JsonResponse(response)
     return HttpResponse('Payments view')
+
+def order_complete(request):
+    order_number = request.GET.get('order_no')
+    transaction_id = request.GET.get('trans_id')
+
+    try:
+        order = Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
+        ordered_food = OrderedFood.objects.filter(order=order)
+
+        subtotal = 0
+        for item in ordered_food:
+            subtotal += (item.price * item.quantity)
+
+        tax_data = json.loads(order.tax_data)
+        print(tax_data)
+        context = {
+            'order': order,
+            'ordered_food': ordered_food,
+            'subtotal': subtotal,
+            'tax_data': tax_data,
+        }
+        return render(request, 'orders/order_complete.html', context)
+    except:
+        return redirect('home')
